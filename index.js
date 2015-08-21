@@ -1,15 +1,15 @@
 'use strict';
 
-var config       = require('./config'),
-    qs           = require('querystring'),
-    got          = require('got'),
-    camelCase    = require('camelcase');
+var config    = require('./config'),
+    qs        = require('querystring'),
+    got       = require('got'),
+    camelCase = require('camelcase');
 
 
 module.exports = VK;
 
 
-function VK (opts) {
+function VK (opts, session) {
 
   if (!(this instanceof VK))
     return new VK(opts);
@@ -21,17 +21,22 @@ function VK (opts) {
   this.redirectUri  = opts.redirectUri;
   this.apiVersion   = opts.apiVersion || config.apiVersion;
 
+  this.session      = session || {};
+
   this._deferred    = [];
 
 };
 
 
-VK.prototype.setToken = function (token, expiresIn) {
+VK.prototype.setToken = function (data) {
 
   var now = (new Date()).valueOf();
 
-  this.token        = token; 
-  this.tokenExpires = (new Date(now + expiresIn*1000)).valueOf();
+  this.session = {
+    token   : data['access_token'],
+    userId  : data['user_id'],
+    expires : (new Date(now + data['expires_in']*1000)).valueOf()
+  }
 
   return this;
 
@@ -40,14 +45,16 @@ VK.prototype.setToken = function (token, expiresIn) {
 
 VK.prototype.getToken = function () {
 
-  return this.token;
+  return (this.hasValidToken()) ? this.session.token : undefined;
 
 }
 
 
-VK.prototype.hasValidToken = function () {
+VK.prototype.hasValidToken = function (session) {
 
-  return !!this.token && (this.tokenExpires > (new Date()).valueOf());
+  var session = session || this.session;
+
+  return !!session && (session.expires > (new Date()).valueOf());
 
 }
 
@@ -90,12 +97,11 @@ VK.prototype.performSiteAuth = function (query, callback) {
   var vk      = this,
       promise = got(config.tokenUrl, gotOptions(query))
       .then(function (res) {
-        var data = res.body;
 
-        vk.setToken(data['access_token'], data['expires_in']);
+        vk.setToken(res.body);
 
         if (typeof callback === 'function')
-          callback(null, data, res);
+          callback(null, res.body, res);
 
         return res;
       });
@@ -126,7 +132,7 @@ VK.prototype.performApiCall = function (method, query, callback) {
 
   query = query || {};
 
-  query['access_token'] = this.token;
+  query['access_token'] = this.session.token;
 
   var url = [config.apiUrl, method].join('/');
 
@@ -163,6 +169,8 @@ VK.prototype.execute = function (query, callback) {
 
   query.code = 'return [' + calls.join(', ') + '];';
 
+  this._deferred = [];
+
   return this.performApiCall('execute', gotOptions(query), callback);
 
 }
@@ -180,7 +188,7 @@ function gotOptions (query) {
 function supplyQuery (query, source, opts) {
 
   opts.forEach(function (option, index, opts) {
-    
+
     if (!query[option])
       if (source[camelCase(option)])
         query[option] = source[camelCase(option)];

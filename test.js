@@ -10,6 +10,7 @@ var VK = vkApiCalls({
 });
 
 
+
 describe('vkApiCalls', function () {
 
   describe('#getToken', function () {
@@ -18,7 +19,13 @@ describe('vkApiCalls', function () {
     }); 
 
     it('and return token when it is set', function () {
-      VK.setToken('THE_TOKEN', 1000);
+      
+      VK.setToken({
+        access_token : 'THE_TOKEN',
+        expires_in   : 1000,
+        user_id      : 1337
+      });
+
       assert.equal('THE_TOKEN', VK.getToken());
     });
 
