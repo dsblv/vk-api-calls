@@ -28,7 +28,7 @@ VK.performSiteAuth({code : 'CODE YOU JUST RECEIVED'})
 
 ## API
 
-### vkApiCalls([options])
+### vkApiCalls([options][, session])
 
 #### options
 
@@ -42,6 +42,20 @@ Options required by VK API:
   apiVersion   : '5.1' // you can omit this, default version is 5.37
 }
 ```
+
+#### session
+
+Session data: user id, access token and when it expires:
+
+```js
+{
+  userId  : 'USER_ID',
+  token   : 'ACCESS_TOKEN',
+  expires : 1440163431337
+}
+```
+
+This will help you not to perform authentication each time user visits your page. Save this in your session storage and use until it's espired.
 
 ### 
 
