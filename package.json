@@ -1,0 +1,34 @@
+{
+  "name": "vk-api-calls",
+  "version": "1.0.0",
+  "description": "VK API calls simplified",
+  "license": "MIT",
+  "repository": "dsblv/vk-api-calls",
+  "author": {
+    "name": "Dmitriy Sobolev",
+    "email": "disobolev@icloud.com",
+    "url": "vk.com/sobo13v"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "index.js",
+  "keywords": [
+    "vk",
+    "вконтакте",
+    "api",
+    "got",
+    "promise",
+    "execute"
+  ],
+  "dependencies": {
+    "camelcase": "^1.2.1",
+    "got": "^4.1.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
+}
