@@ -20,7 +20,7 @@ describe('vkApiCalls', function () {
 
     it('and return token when it is set', function () {
       
-      VK.setToken({
+      VK.setSession({
         access_token : 'THE_TOKEN',
         expires_in   : 1000,
         user_id      : 1337

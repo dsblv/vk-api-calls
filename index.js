@@ -28,7 +28,7 @@ function VK (opts, session) {
 };
 
 
-VK.prototype.setToken = function (data) {
+VK.prototype.setSession = function (data) {
 
   var now = (new Date()).valueOf();
 
@@ -39,6 +39,13 @@ VK.prototype.setToken = function (data) {
   }
 
   return this;
+
+}
+
+
+VK.prototype.getSession = function () {
+
+  return this.session;
 
 }
 
@@ -73,8 +80,7 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 
   query = supplyQuery(query, this, options);
 
-  if (!query['v'] && this.apiVersion)
-    query['v'] = this.apiVersion;
+  query['v'] = query['v'] || this.apiVersion;
 
   return query;
 
@@ -98,7 +104,7 @@ VK.prototype.performSiteAuth = function (query, callback) {
       promise = got(config.tokenUrl, gotOptions(query))
       .then(function (res) {
 
-        vk.setToken(res.body);
+        vk.setSession(res.body);
 
         if (typeof callback === 'function')
           callback(null, res.body, res);
@@ -131,6 +137,8 @@ VK.prototype.performApiCall = function (method, query, callback) {
     throw Error('vkApiCalls: Token is expired or never been set');
 
   query = query || {};
+
+  query['v'] = query['v'] || this.apiVersion;
 
   query['access_token'] = this.session.token;
 
