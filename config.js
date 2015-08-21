@@ -3,7 +3,7 @@ module.exports = {
   apiVersion        : 5.37,
   authUrl           : 'https://oauth.vk.com/authorize',
   tokenUrl          : 'https://oauth.vk.com/access_token',
-  apiUrl            : 'http://api.vk.com/method',
+  apiUrl            : 'https://api.vk.com/method',
 
   defaultGotOptions : {
     json    : true,
