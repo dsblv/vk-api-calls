@@ -1,6 +1,7 @@
 'use strict';
 
 var assert     = require('assert'),
+    stream     = require('stream'),
     vkApiCalls = require('./');
 
 var VK = vkApiCalls({
@@ -34,6 +35,13 @@ describe('vkApiCalls', function () {
   describe('#renderAuthUrl', function () {
     it('should return a string', function () {
       assert.equal('string', typeof VK.renderAuthUrl());
+    });
+  });
+
+
+  describe('#collect', function () {
+    it('should return stream', function () {
+      assert.equal(true, VK.collect() instanceof stream.Readable);
     });
   });
 
