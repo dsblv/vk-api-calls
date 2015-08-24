@@ -189,11 +189,44 @@ VK.prototype.execute = function (query, callback) {
 }
 
 
-VK.prototype.collect = function(method, query) {
+VK.prototype.collectStream = function (method, query) {
 
   return new CollectStream(this, method, query);
 
 };
+
+
+VK.prototype.collect = function (method, query, callback) {
+
+  var stored = {
+      items   : []
+  }
+
+  var promise = new Promise(function (resolve, reject) {
+
+    this.collect(method, query)
+    .on('data', function (data) {
+        stored.items = stored.items.concat(data.items);
+        stored.count = data.count;
+    })
+    .on('error', function (err) {
+        reject(err);
+
+        if (typeof callback === 'function')
+          callback(err, null);
+    })
+    .on('end', function () {
+        resolve(stored);
+
+        if (typeof callback === 'function')
+          callback(null, stored);
+    });
+
+  });
+
+  return (typeof callback === 'function') ? this : promise;
+
+}
 
 
 function gotOptions (query) {

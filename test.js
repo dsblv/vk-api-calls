@@ -39,9 +39,9 @@ describe('vkApiCalls', function () {
   });
 
 
-  describe('#collect', function () {
+  describe('#collectStream', function () {
     it('should return stream', function () {
-      assert.equal(true, VK.collect() instanceof stream.Readable);
+      assert.equal(true, VK.collectStream() instanceof stream.Readable);
     });
   });
 
