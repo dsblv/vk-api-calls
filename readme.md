@@ -3,6 +3,15 @@
 > Yet another VK API wrapper for Node.js & io.js.
 
 
+## Features
+
+* Callbacks or Promises
+* (Kind of) easy authentication
+* Multiple calls at once via [execute](http://vk.com/dev/execute)
+* Collecting paged data
+* Automatic request rate throttleing
+
+
 ## Usage
 
 ```js
