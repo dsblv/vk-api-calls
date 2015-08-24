@@ -1,9 +1,10 @@
 'use strict';
 
-var config    = require('./config'),
-    qs        = require('querystring'),
-    got       = require('got'),
-    camelCase = require('camelcase');
+var config        = require('./config'),
+    got           = require('got'),
+    qs            = require('querystring'),
+    camelCase     = require('camelcase'),
+    CollectStream = require('./lib/collect-stream');
 
 
 module.exports = VK;
@@ -87,7 +88,8 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 }
 
 
-VK.prototype.renderAuthUrl = function (query) {
+VK.prototype.renderAuthUrl =
+VK.prototype.authUrl       = function (query) {
 
   query = this._prepareAuthQuery(query);
 
@@ -96,7 +98,8 @@ VK.prototype.renderAuthUrl = function (query) {
 }
 
 
-VK.prototype.performSiteAuth = function (query, callback) {
+VK.prototype.performSiteAuth =
+VK.prototype.siteAuth        = function (query, callback) {
 
   query = this._prepareAuthQuery(query, true);
 
@@ -117,7 +120,8 @@ VK.prototype.performSiteAuth = function (query, callback) {
 }
 
 
-VK.prototype.performServerAuth = function (query, callback) {
+VK.prototype.performServerAuth =
+VK.prototype.serverAuth        = function (query, callback) {
 
   query = query || {};
 
@@ -128,7 +132,8 @@ VK.prototype.performServerAuth = function (query, callback) {
 }
 
 
-VK.prototype.performApiCall = function (method, query, callback) {
+VK.prototype.performApiCall =
+VK.prototype.apiCall        = function (method, query, callback) {
 
   if (typeof method != 'string')
     throw TypeError('vkApiCalls: Method name should be a string');
@@ -182,6 +187,13 @@ VK.prototype.execute = function (query, callback) {
   return this.performApiCall('execute', gotOptions(query), callback);
 
 }
+
+
+VK.prototype.collect = function(method, query) {
+
+  return new CollectStream(this, method, query);
+
+};
 
 
 function gotOptions (query) {
