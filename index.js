@@ -198,19 +198,24 @@ VK.prototype.collectStream = function (method, query) {
 
 VK.prototype.collect = function (method, query, callback) {
 
-  var stored = {
-      items   : []
-  }
+  var _this  = this,
+      stored = {
+          items: []
+      };
 
   var promise = new Promise(function (resolve, reject) {
 
-    this.collect(method, query)
+    _this.collectStream(method, query)
     .on('data', function (data) {
         stored.items = stored.items.concat(data.items);
         stored.count = data.count;
+
+        console.log(data);
     })
     .on('error', function (err) {
         reject(err);
+
+        console.log(err);
 
         if (typeof callback === 'function')
           callback(err, null);
