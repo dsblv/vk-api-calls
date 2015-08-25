@@ -26,7 +26,8 @@
   ],
   "dependencies": {
     "camelcase": "^1.2.1",
-    "got": "^4.1.1"
+    "got": "^4.1.1",
+    "object-assign": "^4.0.1"
   },
   "devDependencies": {
     "mocha": "^2.2.5"
