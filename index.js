@@ -177,11 +177,9 @@ VK.prototype.collect = function (method, query, callback) {
 			stored.items = stored.items.concat(data.items);
 			stored.count = data.count;
 
-			console.log(stored.items.length + ' items stored');
+			console.log(stored.items.length + ' items stored ' + (new Date()));
 		}).on('error', function (err) {
 			reject(err);
-
-			console.log(err);
 
 			if (typeof callback === 'function') {
 				callback(err, null);
