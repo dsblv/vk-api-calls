@@ -4,6 +4,7 @@ module.exports = {
 	tokenUrl: 'https://oauth.vk.com/access_token',
 	apiUrl: 'https://api.vk.com/method',
 	delay: 666,
+	afterError: 60000,
 
 	defaultGotOptions: {
 		json: true,
