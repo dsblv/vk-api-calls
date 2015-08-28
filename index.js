@@ -176,6 +176,7 @@ VK.prototype.collect = function (method, query, callback) {
 		_this.collectStream(method, query).on('data', function (data) {
 			stored.items = stored.items.concat(data.items);
 			stored.count = data.count;
+			stored.groupId = data.groupId;
 
 			console.log(stored.items.length + ' items stored ' + (new Date()));
 		}).on('error', function (err) {
