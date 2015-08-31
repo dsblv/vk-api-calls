@@ -208,9 +208,10 @@ VK.prototype._enqueue = function () {
 
 	if (!this._canCall()) {
 		remains = this.nextCall - new Date();
+		this.nextCall = new Date(this.nextCall.valueOf() + this.delay);
+	} else {
+		this.nextCall = new Date((new Date()).valueOf() + this.delay);
 	}
-
-	this.nextCall = new Date(this.nextCall.valueOf() + this.delay);
 
 	return new Promise(function (resolve) {
 		setTimeout(resolve, remains);
