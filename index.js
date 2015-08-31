@@ -6,22 +6,17 @@ var camelCase = require('camelcase');
 var objectAssign = require('object-assign');
 var config = require('./config');
 var CollectStream = require('./lib/collect-stream');
+var Execution = require('./lib/execution');
 
 module.exports = VK;
 
-function VK(opts, session) {
+function VK(app, opts, session) {
 	if (!(this instanceof VK)) {
 		return new VK(opts);
 	}
 
-	opts = opts || {};
-
-	this.clientId = opts.clientId;
-	this.clientSecret = opts.clientSecret;
-	this.redirectUri = opts.redirectUri;
-	this.apiVersion = opts.apiVersion || config.apiVersion;
-	this.delay = opts.delay || config.delay;
-
+	this.app = app || {};
+	this.opts = objectAssign(config, opts);
 	this.session = session || {};
 
 	this._deferred = [];
@@ -67,7 +62,7 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 
 	query = supplyQuery(query, this, options);
 
-	query['v'] = query['v'] || this.apiVersion;
+	query['v'] = query['v'] || this.opts.apiVersion;
 
 	return query;
 };
@@ -82,11 +77,13 @@ VK.prototype.performSiteAuth =
 VK.prototype.siteAuth = function (query, callback) {
 	query = this._prepareAuthQuery(query, true);
 
-	var vk = this;
-	var promise = got(config.tokenUrl, gotOptions({
+	var _this = this;
+
+	var promise = got(this.opts.tokenUrl, this._gotOptions({
 		query: query
-	})).then(function (res) {
-		vk.setSession(res.body);
+	}))
+	.then(function (res) {
+		_this.setSession(res.body);
 
 		if (typeof callback === 'function') {
 			callback(null, res.body, res);
@@ -118,48 +115,21 @@ VK.prototype.apiCall = function (method, query, callback) {
 
 	query = query || {};
 
-	query['v'] = query['v'] || this.apiVersion;
+	query['v'] = query['v'] || this.opts.apiVersion;
 
 	query['access_token'] = this.session.token;
 
 	var url = [config.apiUrl, method].join('/');
 
+	var _this = this;
+
 	return this._enqueue().then(function () {
-		got.post(url, gotOptions({query: query}), callback);
+		got.post(url, _this._gotOptions({query: query}), callback);
 	});
 };
 
-VK.prototype.defer = function (method, query) {
-	if (typeof method !== 'string') {
-		throw Error('vkApiCalls: Method name should be a string');
-	}
-
-	this._deferred.push({
-		method: method,
-		query: query || {}
-	});
-
-	return this;
-};
-
-VK.prototype.execute = function (query, callback) {
-	if (this._deferred.length === 0) {
-		throw Error('vkApiCalls: There\'s nothing to execute');
-	}
-
-	var calls = this._deferred.map(function (call) {
-		return 'API.' + call.method + '(' + JSON.stringify(call.query) + ')';
-	});
-
-	query = query || {};
-
-	query['code'] = 'return [' + calls.join(', ') + '];';
-
-	this._deferred = [];
-
-	return this.performApiCall('execute', gotOptions({
-		query: query
-	}), callback);
+VK.prototype.execution = function () {
+	return new Execution(this);
 };
 
 VK.prototype.collectStream = function (method, query) {
@@ -173,19 +143,19 @@ VK.prototype.collect = function (method, query, callback) {
 	};
 
 	var promise = new Promise(function (resolve, reject) {
-		_this.collectStream(method, query).on('data', function (data) {
-			stored.items = stored.items.concat(data.items);
-			stored.count = data.count;
-			stored.groupId = data.groupId;
-
-			console.log(stored.items.length + ' items stored ' + (new Date()));
-		}).on('error', function (err) {
+		_this.collectStream(method, query)
+		.on('data', function (data) {
+			data.items = stored.items.concat(data.items);
+			stored = objectAssign(stored, data);
+		})
+		.on('error', function (err) {
 			reject(err);
 
 			if (typeof callback === 'function') {
 				callback(err, null);
 			}
-		}).on('end', function () {
+		})
+		.on('end', function () {
 			resolve(stored);
 
 			if (typeof callback === 'function') {
@@ -208,9 +178,9 @@ VK.prototype._enqueue = function () {
 
 	if (!this._canCall()) {
 		remains = this.nextCall - new Date();
-		this.nextCall = new Date(this.nextCall.valueOf() + this.delay);
+		this.nextCall = new Date(this.nextCall.valueOf() + this.opts.delay);
 	} else {
-		this.nextCall = new Date((new Date()).valueOf() + this.delay);
+		this.nextCall = new Date(Date.now() + this.opts.delay);
 	}
 
 	return new Promise(function (resolve) {
@@ -218,9 +188,9 @@ VK.prototype._enqueue = function () {
 	});
 };
 
-function gotOptions(opts) {
-	return objectAssign(config.defaultGotOptions || {}, opts);
-}
+VK.prototype._gotOptions = function (opts) {
+	return objectAssign(this.opts.defaultGotOptions || {}, opts);
+};
 
 function supplyQuery(query, source, opts) {
 	opts.forEach(function (option) {
