@@ -195,13 +195,88 @@ One of [VK API methods](http://vk.com/dev/methods).
 
 Type: `object`
 
-Query parameters you watnt to pass to VK API method. Required authentication data will be attached automatically.
+Query parameters you want to pass to VK API method. Required authentication data will be attached automatically.
 
 ##### callback(error, data, response)
 
 Type: `function`
 
 If callback is supplied, it will be called when server responds. Otherwise, the method returns a Promise.
+
+
+#### `vk.collectStream(method, [query])` → `[readable stream](https://nodejs.org/api/stream.html#stream_class_stream_readable)`
+
+This metod allows you to get more data than VK restrictions allow by sending multiple requests. Every API response will emit `data` event with received data so you can operatively store it.
+
+Stream emits `data`, `error` and `end` events.
+
+API request rate is limited to match VK API requirements.
+
+##### method
+
+*Required*  
+Type: `string`
+
+One of [VK API methods](http://vk.com/dev/methods).
+
+##### query
+
+Type: `object`
+
+Query parameters you want to pass to VK API method. Required authentication data will be attached automatically.
+
+Example:
+
+```js
+// your save-to-database module
+var save = require('./save');
+
+// let's get 10000 members of a group
+// when maximum per request is 1000
+
+var stream = vk.collectStream('groups.getMembers', {
+	group_id: 1,
+	count: 10000
+});
+
+stream.on('data', function (data) {
+	save(data.items);
+});
+
+stream.on('error', function (error) {
+	console.error('wild error appears');
+});
+```
+
+#### `vk.collect(method, [query], [callback])` → `promise/this`
+
+Wrapper around #collectStream() that collects the whole stream.
+
+Arguments are same as in [#peformApiCall()](#vkperformapicallmethod-query-callback--promisethis)
+
+---
+
+### Deferred execution
+
+**vk-api-calls** provides a way to collect several API calls and run them all at once via [execute method](http://vk.com/dev/execute). This approach can speed up your application, as yo're able to retreive all data you need by one shot.
+
+#### `vk.execution()` → `execution`
+
+This method return an Execution object instance — a sort of deferred calls collection.
+
+#### `execution.push(method, [query])` → `this`
+
+Add an API call to the set.
+
+Arguments are same as in [#peformApiCall()](#vkperformapicallmethod-query-callback--promisethis) except `callback` — no callbacks needed here.
+
+#### `execution.code()` → `string`
+
+Generates `code` for [execution by VK](http://vk.com/dev/execute) at any point of time.
+
+#### `execution.execute([callback])` → `promise/vk-api-calls instance`
+
+Runs the execution via [#peformApiCall()](#vkperformapicallmethod-query-callback--promisethis) with `'execute'` as first argument.
 
 ## License
 
