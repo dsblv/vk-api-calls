@@ -204,7 +204,7 @@ Type: `function`
 If callback is supplied, it will be called when server responds. Otherwise, the method returns a Promise.
 
 
-#### `vk.collectStream(method, [query])` → `[readable stream](https://nodejs.org/api/stream.html#stream_class_stream_readable)`
+#### `vk.collectStream(method, [query])` → [readable stream](https://nodejs.org/api/stream.html#stream_class_stream_readable)
 
 This metod allows you to get more data than VK restrictions allow by sending multiple requests. Every API response will emit `data` event with received data so you can operatively store it.
 
@@ -262,7 +262,7 @@ Arguments are same as in [#peformApiCall()](#vkperformapicallmethod-query-callba
 
 #### `vk.execution()` → `execution`
 
-This method return an Execution object instance — a sort of deferred calls collection.
+This method return an Execution object instance.
 
 #### `execution.push(method, [query])` → `this`
 
@@ -277,6 +277,23 @@ Generates `code` for [execution by VK](http://vk.com/dev/execute) at any point o
 #### `execution.execute([callback])` → `promise/vk-api-calls instance`
 
 Runs the execution via [#peformApiCall()](#vkperformapicallmethod-query-callback--promisethis) with `'execute'` as first argument.
+
+Example:
+
+```js
+var exec = vk.execution();
+
+exec
+.push('users.get', {user_ids: 1})
+.push('wall.get', {owner_id: 1})
+.push('photos.get', {owner_id: 1})
+.execute()
+.then(function (data) {
+	console.log('Name: ' + data[0].response.first_name);
+	console.log('Wall posts: ' + data[1].response.count);
+	console.log('Photos posts: ' + data[2].response.count);
+});
+```
 
 ## License
 
