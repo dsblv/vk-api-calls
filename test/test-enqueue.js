@@ -1,4 +1,4 @@
-var test = require('ava');
+var test = require('tape');
 var VK = require('../');
 
 test('throttleing requests via _enqueue', function (t) {
@@ -12,11 +12,12 @@ test('throttleing requests via _enqueue', function (t) {
 
 	vk._enqueue()
 	.then(function () {
-		t.assert(Date.now() - now < 10);
+		t.ok(Date.now() - now < 100, 'first request is not delayed');
 	});
 
-	return vk._enqueue()
+	vk._enqueue()
 	.then(function () {
-		t.assert(Date.now() - now >= 1000);
+		t.ok(Date.now() - now >= 1000, 'next request is delayed by 1 second');
+		t.end();
 	});
 });

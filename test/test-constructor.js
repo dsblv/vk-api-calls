@@ -1,4 +1,4 @@
-var test = require('ava');
+var test = require('tape');
 var VK = require('../');
 
 var app = {
@@ -19,20 +19,20 @@ var sess = {
 
 test('accepting app data', function (t) {
 	var vk = new VK(app);
-	t.is(vk.app.clientId, app.clientId);
-	t.is(vk.app.clientSecret, app.clientSecret);
-	t.is(vk.app.redirectUri, app.redirectUri);
+	t.is(vk.app.clientId, app.clientId, 'clientId saved');
+	t.is(vk.app.clientSecret, app.clientSecret, 'clientSecret saved');
+	t.is(vk.app.redirectUri, app.redirectUri, 'redirectUri saved');
 	t.end();
 });
 
 test('updating default options', function (t) {
 	var vk = new VK(app, opts);
-	t.is(vk.opts.delay, opts.delay);
+	t.is(vk.opts.delay, opts.delay, 'delay overriden');
 	t.end();
 });
 
 test('accepting session', function (t) {
 	var vk = new VK(app, opts, sess);
-	t.is(vk.session, sess);
+	t.is(vk.session, sess, 'session data saved');
 	t.end();
 });

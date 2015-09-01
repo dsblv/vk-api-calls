@@ -13,7 +13,7 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "test": "xo && ava"
+    "test": "xo && tape test/*.js"
   },
   "main": "index.js",
   "keywords": [
@@ -30,7 +30,7 @@
     "object-assign": "^4.0.1"
   },
   "devDependencies": {
-    "ava": "^0.1.0",
+    "tape": "^4.2.0",
     "xo": "^0.7.1"
   },
   "xo": {
