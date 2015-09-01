@@ -60,7 +60,7 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 		options.push('client_secret');
 	}
 
-	query = supplyQuery(query, this, options);
+	query = supplyQuery(query, this.app, options);
 
 	query['v'] = query['v'] || this.opts.apiVersion;
 
