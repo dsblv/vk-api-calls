@@ -91,7 +91,7 @@ Saves session data.
 
 ##### data
 
-*Required*
+*Required*  
 Type: `object`
 
 Data returned by VK API server:
@@ -144,7 +144,7 @@ Performs [Authorization Code Flow](http://vk.com/dev/auth_sites) auth.
 
 ##### query
 
-*Required*
+*Required*  
 Type: `object`
 
 Query has only one required parameter — `code` — which is returned by VK API server when user is successfully logged in.
@@ -186,7 +186,7 @@ Performs API requests.
 
 ##### method
 
-*Required*
+*Required*  
 Type: `string`
 
 One of [VK API methods](http://vk.com/dev/methods).
