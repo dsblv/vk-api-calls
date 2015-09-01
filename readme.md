@@ -106,16 +106,19 @@ Data returned by VK API server:
 
 *Note that this time `expires_in` is relative. The module will internally convert in to absolute value.*
 
+---
 
 #### `vk.getSession()` → `object`
 
 Returns session data prepared for storing in session storage.
 
+---
 
 #### `vk.getToken()` → `string`
 
 Returns current `access token` or `undefined` if it's expired or not set.
 
+---
 
 #### `vk.hasValidToken()` → `boolean`
 
@@ -135,6 +138,7 @@ Type: `object`
 
 Query parameters you may want to manually override.
 
+---
 
 #### `vk.performSiteAuth(query, [callback])` → `promise/this`
 
@@ -155,6 +159,7 @@ Type: `function`
 
 If callback is supplied, it will be called when server responds. Otherwise, the method returns a Promise.
 
+---
 
 #### `vk.performServerAuth([query], [callback])` → `promise/this`
 
