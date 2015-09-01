@@ -1,4 +1,4 @@
-vk-api-calls [![Build Status](https://img.shields.io/travis/dsblv/vk-api-calls.svg?style=flat-square)](https://travis-ci.org/dsblv/vk-api-calls)
+vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](https://travis-ci.org/dsblv/vk-api-calls)
 ============
 
 > Yet another VK API wrapper for Node.js & io.js.
