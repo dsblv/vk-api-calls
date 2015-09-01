@@ -4,6 +4,7 @@ var got = require('got');
 var qs = require('querystring');
 var camelCase = require('camelcase');
 var objectAssign = require('object-assign');
+var allMethods = require('vk-api-all-methods');
 var openMethods = require('vk-api-open-methods');
 var config = require('./config');
 var CollectStream = require('./lib/collect-stream');
@@ -110,8 +111,12 @@ VK.prototype.apiCall = function (method, query, callback) {
 		throw Error('vkApiCalls: Method name should be a string');
 	}
 
+	if (!isMethod(method)) {
+		throw Error('vkApiCalls: Unknown method');
+	}
+
 	if (!isOpenMethod(method) && !this.hasValidToken()) {
-		throw Error('vkApiCalls: Token is expired or never been set');
+		throw Error('vkApiCalls: Token is expired or not set');
 	}
 
 	query = query || {};
@@ -194,6 +199,12 @@ VK.prototype._enqueue = function () {
 VK.prototype._gotOptions = function (opts) {
 	return objectAssign(this.opts.defaultGotOptions || {}, opts);
 };
+
+// helper functions
+
+function isMethod(method) {
+	return (method.split('.')[0] === 'execute') || (allMethods.indexOf(method) !== -1);
+}
 
 function isOpenMethod(method) {
 	return (openMethods.indexOf(method) !== -1);
