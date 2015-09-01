@@ -10,7 +10,7 @@
     "url": "vk.com/sobo13v"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=0.12.0"
   },
   "scripts": {
     "test": "xo && tape test/*.js"
