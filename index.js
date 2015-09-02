@@ -82,10 +82,7 @@ VK.prototype.authUrl = function (query) {
 	return [config.authUrl, qs.stringify(query)].join('?');
 };
 
-VK.prototype.performSiteAuth =
-VK.prototype.siteAuth = function (query, callback) {
-	query = this._prepareAuthQuery(query, true);
-
+VK.prototype._performAuth = function (query, callback) {
 	var _this = this;
 
 	var promise = got(this.opts.tokenUrl, this._gotOptions({
@@ -104,9 +101,20 @@ VK.prototype.siteAuth = function (query, callback) {
 	return (typeof callback === 'function') ? this : promise;
 };
 
+VK.prototype.performSiteAuth =
+VK.prototype.siteAuth = function (query, callback) {
+	if (typeof query['code'] === 'undefined') {
+		throw new Error('Authorization Code Flow requires CODE parameter');
+	}
+
+	query = this._prepareAuthQuery(query, true);
+
+	return this._performAuth(query, callback);
+};
+
 VK.prototype.performServerAuth =
 VK.prototype.serverAuth = function (query, callback) {
-	query = query || {};
+	query = query = this._prepareAuthQuery(query, false);
 	query['grant_type'] = 'client_credentials';
 
 	return this.performSiteAuth(query, callback);
