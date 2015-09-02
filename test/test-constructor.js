@@ -4,7 +4,8 @@ var VK = require('../');
 var app = {
 	clientId: 'CLIENT_ID',
 	clientSecret: 'CLIENT_SECRET',
-	redirectUri: 'REDIRECT_URI'
+	redirectUri: 'REDIRECT_URI',
+	scope: ['wall', 'friends']
 };
 
 var opts = {
@@ -22,6 +23,7 @@ test('accepting app data', function (t) {
 	t.is(vk.app.clientId, app.clientId, 'clientId saved');
 	t.is(vk.app.clientSecret, app.clientSecret, 'clientSecret saved');
 	t.is(vk.app.redirectUri, app.redirectUri, 'redirectUri saved');
+	t.is(vk.app.scope, 'wall,friends', 'scope saves and transformed to string');
 	t.end();
 });
 

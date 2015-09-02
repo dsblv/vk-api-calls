@@ -4,8 +4,7 @@ var got = require('got');
 var qs = require('querystring');
 var camelCase = require('camelcase');
 var objectAssign = require('object-assign');
-var allMethods = require('vk-api-all-methods');
-var openMethods = require('vk-api-open-methods');
+var vkUtil = require('vk-api-util');
 var config = require('./config');
 var CollectStream = require('./lib/collect-stream');
 var Execution = require('./lib/execution');
@@ -18,6 +17,13 @@ function VK(app, opts, session) {
 	}
 
 	this.app = app || {};
+
+	if (this.app.scope instanceof Array) {
+		this.app.scope = this.app.scope.join(',');
+	} else {
+		this.app.scope = (typeof this.app.scope === 'string') ? this.app.scope : '';
+	}
+
 	this.opts = objectAssign(config, opts);
 	this.session = session || {};
 
@@ -55,7 +61,8 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 
 	var options = [
 		'client_id',
-		'redirect_uri'
+		'redirect_uri',
+		'scope'
 	];
 
 	if (includeSecret || false) {
@@ -108,22 +115,26 @@ VK.prototype.serverAuth = function (query, callback) {
 VK.prototype.performApiCall =
 VK.prototype.apiCall = function (method, query, callback) {
 	if (typeof method !== 'string') {
-		throw Error('vkApiCalls: Method name should be a string');
+		throw new Error('Method name should be a string');
 	}
 
-	if (!isMethod(method)) {
-		throw Error('vkApiCalls: Unknown method');
+	if (!vkUtil.isMethod(method)) {
+		throw new Error('Unknown method');
 	}
 
-	if (!isOpenMethod(method) && !this.hasValidToken()) {
-		throw Error('vkApiCalls: Token is expired or not set');
+	if (!this.hasInScope(method)) {
+		throw new Error('Method "' + method + '" is not in your application\'s scope');
+	}
+
+	if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
+		throw new Error('Token is expired or not set');
 	}
 
 	query = query || {};
 
 	query['v'] = query['v'] || this.opts.apiVersion;
 
-	if (!isOpenMethod(method)) {
+	if (!vkUtil.isOpenMethod(method)) {
 		query['access_token'] = this.session.token;
 	}
 
@@ -175,6 +186,10 @@ VK.prototype.collect = function (method, query, callback) {
 	return (typeof callback === 'function') ? this : promise;
 };
 
+VK.prototype.hasInScope = function (method) {
+	return vkUtil.isMethodInScope(method, this.app.scope);
+};
+
 VK.prototype._canCall = function () {
 	var now = new Date();
 	this.nextCall = this.nextCall || now;
@@ -200,23 +215,13 @@ VK.prototype._gotOptions = function (opts) {
 	return objectAssign(this.opts.defaultGotOptions || {}, opts);
 };
 
-// helper functions
-
-function isMethod(method) {
-	return (method.split('.')[0] === 'execute') || (allMethods.indexOf(method) !== -1);
-}
-
-function isOpenMethod(method) {
-	return (openMethods.indexOf(method) !== -1);
-}
-
 function supplyQuery(query, source, opts) {
 	opts.forEach(function (option) {
 		if (!query[option]) {
-			if (source[camelCase(option)]) {
+			if (typeof source[camelCase(option)] !== 'undefined') {
 				query[option] = source[camelCase(option)];
 			} else {
-				throw Error('vkApiCalls: Please supply "' + option + '" option');
+				throw new Error('Please supply "' + option + '" option');
 			}
 		}
 	});

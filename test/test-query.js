@@ -16,6 +16,7 @@ test('rendering query string for authentication requests', function (t) {
 		'client_id': 'CLIENT_ID',
 		'hello': 'world',
 		'redirect_uri': 'REDIRECT_URI',
+		'scope': '',
 		'v': 5.37
 	}, 'safe query doesn\'t contain clientSecret');
 
@@ -24,6 +25,7 @@ test('rendering query string for authentication requests', function (t) {
 		'client_secret': 'CLIENT_SECRET',
 		'hello': 'world',
 		'redirect_uri': 'REDIRECT_URI',
+		'scope': '',
 		'v': 5.37
 	}, 'unsafe query contains clientSecret');
 

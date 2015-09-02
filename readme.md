@@ -295,6 +295,19 @@ exec
 });
 ```
 
+---
+
+### Utility methods
+
+#### `vk.hasInScope(method)` → `boolean`
+
+Tells if application scope allows you to call particular method. **vk-api-calls** performs this check internally before every call, so you don't need to do it yourself.
+
+##### method
+
+*Required*  
+Type: `string`
+
 ## License
 
 MIT © [Dmitriy Sobolev](http://vk.com/sobo13v)
