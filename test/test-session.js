@@ -12,8 +12,9 @@ test('saving session data', function (t) {
 
 	vk.setSession(data);
 
-	t.plan(1);
-	t.is('ACCESS_TOKEN', vk.getToken(), 'access token saved and returned by #getToken()');
+	t.plan(2);
+	t.is(vk.getToken(), 'ACCESS_TOKEN', 'access token saved and returned by #getToken()');
+	t.is(vk.getSession().token, 'ACCESS_TOKEN', 'session is saved and returned by #getSession()');
 	t.end();
 });
 

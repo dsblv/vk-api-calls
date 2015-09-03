@@ -101,7 +101,7 @@ VK.prototype._performAuth = function (query, callback) {
 
 VK.prototype.performSiteAuth =
 VK.prototype.siteAuth = function (query, callback) {
-	if (typeof query['code'] === 'undefined') {
+	if (!query || typeof query['code'] === 'undefined') {
 		throw new Error('Authorization Code Flow requires CODE parameter');
 	}
 
@@ -115,7 +115,7 @@ VK.prototype.serverAuth = function (query, callback) {
 	query = query = this._prepareAuthQuery(query, false);
 	query['grant_type'] = 'client_credentials';
 
-	return this.performSiteAuth(query, callback);
+	return this._performAuth(query, callback);
 };
 
 VK.prototype.performApiCall =
@@ -136,7 +136,11 @@ VK.prototype.apiCall = function (method, query, callback) {
 		throw new Error('Token is expired or not set');
 	}
 
-	query = query || {};
+	if (typeof query === 'function') {
+		callback = query;
+	}
+
+	query = (typeof query === 'object') ? query : {};
 
 	query['v'] = query['v'] || this.opts.apiVersion;
 
@@ -148,9 +152,11 @@ VK.prototype.apiCall = function (method, query, callback) {
 
 	var _this = this;
 
-	return this._enqueue().then(function () {
+	var promise = this._enqueue().then(function () {
 		got.post(url, _this._gotOptions({query: query}), callback);
 	});
+
+	return (typeof callback === 'function') ? this : promise;
 };
 
 VK.prototype.execution = function () {

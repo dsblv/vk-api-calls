@@ -18,6 +18,12 @@ var sess = {
 	expires: 84600
 };
 
+test('automatic instance creation', function (t) {
+	var vk = VK(app);
+	t.ok(vk instanceof VK, 'new instance created without "new"');
+	t.end();
+});
+
 test('accepting app data', function (t) {
 	var vk = new VK(app);
 	t.is(vk.app.clientId, app.clientId, 'clientId saved');

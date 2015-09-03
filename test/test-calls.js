@@ -1,5 +1,6 @@
 var test = require('tap').test;
 var VK = require('../');
+var ReadableStream = require('stream').Readable;
 
 var app = {
 	clientId: 'CLIENT_ID',
@@ -28,6 +29,24 @@ test('pre-request checks', function (t) {
 	t.throws(function () {
 		vk.performApiCall('photos.getAlbumsCount');
 	}, 'throws when token is needed but not provided');
+
+	t.end();
+});
+
+test('making request', function (t) {
+	var vk = new VK(app);
+
+	t.ok(vk.performApiCall('users.get') instanceof Promise, '#performApiCall() without callback returns Promise');
+	t.ok(vk.performApiCall('users.get', {}, function () {}) instanceof VK, '#performApiCall() with callback returns VK');
+	t.ok(vk.performApiCall('users.get', function () {}) instanceof VK, '#performApiCall() with callback in place of query returns VK');
+
+	t.end();
+});
+
+test('collect stream', function (t) {
+	var vk = new VK(app);
+
+	t.ok(vk.collectStream('groups.getMembers') instanceof ReadableStream, '#collectStream returns stream.Readable instance');
 
 	t.end();
 });
