@@ -34,7 +34,8 @@ Info about your [app](http://vk.com/apps?act=manage) for future authentication:
 {
 	clientId: 'CLIENT_ID',
 	clientSecret: 'CLIENT_SECRET',
-	redirectUri: 'REDIRECT_URI'
+	redirectUri: 'REDIRECT_URI',
+	scope: ['SCOPE_0', 'SCOPE_1']
 }
 ```
 
