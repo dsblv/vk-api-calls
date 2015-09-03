@@ -13,7 +13,7 @@
     "node": ">=0.12.0"
   },
   "scripts": {
-    "test": "xo && tape test/*.js"
+    "test": "xo && tap test/*.js"
   },
   "main": "index.js",
   "keywords": [
@@ -28,6 +28,7 @@
     "camelcase": "^1.2.1",
     "got": "^4.1.1",
     "object-assign": "^4.0.1",
+    "tap": "^1.4.0",
     "vk-api-util": "^1.1.0"
   },
   "devDependencies": {
