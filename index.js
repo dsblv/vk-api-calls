@@ -31,12 +31,10 @@ function VK(app, opts, session) {
 }
 
 VK.prototype.setSession = function (data) {
-	var now = (new Date()).valueOf();
-
 	this.session = {
 		token: data.access_token,
 		userId: data.user_id,
-		expires: (new Date(now + data.expires_in * 1000)).valueOf()
+		expires: (data.expires_in === 0) ? 0 : Date.now() + data.expires_in * 1000
 	};
 
 	return this;
@@ -53,7 +51,7 @@ VK.prototype.getToken = function () {
 VK.prototype.hasValidToken = function (session) {
 	session = session || this.session;
 
-	return Boolean(session) && (session.expires > (new Date()).valueOf());
+	return Boolean(session) && (session.expires === 0 || session.expires > Date.now());
 };
 
 VK.prototype._prepareAuthQuery = function (query, includeSecret) {
