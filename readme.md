@@ -1,4 +1,4 @@
-vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](https://travis-ci.org/dsblv/vk-api-calls) [![Dependency Status](https://david-dm.org/dsblv/vk-api-calls.svg)](https://david-dm.org/dsblv/vk-api-calls)
+vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](https://travis-ci.org/dsblv/vk-api-calls) [![Coverage Status](https://coveralls.io/repos/dsblv/vk-api-calls/badge.svg?branch=master&service=github)](https://coveralls.io/github/dsblv/vk-api-calls?branch=master) [![Dependency Status](https://david-dm.org/dsblv/vk-api-calls.svg)](https://david-dm.org/dsblv/vk-api-calls)
 ============
 
 > Yet another VK API wrapper for Node.js & io.js.

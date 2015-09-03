@@ -1,4 +1,4 @@
-var test = require('tape');
+var test = require('tap').test;
 var VK = require('../');
 
 test('throttleing requests via _enqueue', function (t) {

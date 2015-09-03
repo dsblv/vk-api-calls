@@ -1,4 +1,4 @@
-var test = require('tape');
+var test = require('tap').test;
 var VK = require('../');
 
 test('deferring calls for multiple execution', function (t) {
