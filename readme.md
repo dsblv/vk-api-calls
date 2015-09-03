@@ -11,8 +11,7 @@ vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](htt
 * Automatic request rate throttleing
 * Callbacks/Promises agnostic
 
-## Installing
-**the module not yet published**
+## Install
 
 ```sh
 npm install --save vk-api-calls
