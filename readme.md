@@ -8,7 +8,7 @@ vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](htt
 * (Kind of) easy authentication
 * Multiple API calls at once via [execute](http://vk.com/dev/execute)
 * Collecting paged data
-* Automatic request rate throttleing
+* Automatic request rate debouncing
 * Callbacks/Promises agnostic
 
 ## Install
@@ -27,41 +27,66 @@ npm install --save vk-api-calls
 
 Type: `object`
 
-Info about your [app](http://vk.com/apps?act=manage) for future authentication:
+Info about your [app](http://vk.com/apps?act=manage) for future authentication.
 
-```js
-{
-	clientId: 'CLIENT_ID',
-	clientSecret: 'CLIENT_SECRET',
-	redirectUri: 'REDIRECT_URI',
-	scope: ['SCOPE_0', 'SCOPE_1']
-}
-```
+###### clientId
+
+Type: `number` or `string`
+
+Your app's ID.
+
+###### clientSecret
+
+Type: `string`
+
+Your app's Secure Key.
+
+###### redirectUri
+
+Type: `string`
+
+Redirect URI as specified in your app's options.
+
+###### scope
+
+Type: `string`, `array` or `number`
+
+List of desirable scopes for your app or calculated bit mask.
+
+###### v
+
+Type: `string` or `number`
+
+[Version of VK API](http://vk.com/dev/versions) you want to work with.
+
 
 ##### options
 
 Type: `object`
 
-Custom module settings, defaults are:
+Custom **vk-api-calls** settings.
 
-```js
-{
-	apiVersion: 5.37,
-	authUrl: 'https://oauth.vk.com/authorize',
-	tokenUrl: 'https://oauth.vk.com/access_token',
-	apiUrl: 'https://api.vk.com/method',
-	delay: 666,
-	afterError: 60000,
+###### interval
 
-	defaultGotOptions: {
-		json: true,
-		timeout: 30000,
-		headers: {
-			'user-agent': 'https://github.com/dsblv/vk-api-calls'
-		}
-	}
-}
-```
+Type: `number`  
+Default: `666`
+
+Delay for API calls debouncing in milliseconds. Has to be at least 333 because of API restrictions.
+
+###### timeout
+
+Type: `number`  
+Default: `30000`
+
+Milliseconds untill `ETIMEDOUT` error is thrown if there's no response from the server.
+
+###### headers
+
+Type: `object`  
+Default: `{'user-agent': 'https://github.com/dsblv/vk-api-calls'}`
+
+Headers to be sent with each request. `user-agent` contains a link to this repo by default. Provide some information about your app here so VK server administration will beter know what's going on.
+
 
 ##### session
 
@@ -77,7 +102,7 @@ Session data: user id, access token and when it expires:
 }
 ```
 
-This will help you not to perform authentication each time user visits your page. Save this in your session storage and use until it's expired.
+This will help you not to perform authentication each time user visits your page. Save this in your session storage and use until it's expired. If expires is set to `0`, token is assumed to be eternal.
 
 *Note that `expires` value is not relative, but absolute*
 
