@@ -4,10 +4,11 @@ var got = require('got');
 var qs = require('querystring');
 var camelCase = require('camelcase');
 var objectAssign = require('object-assign');
+var filterObj = require('filter-obj');
 var vkUtil = require('vk-api-util');
-var config = require('./config');
 var CollectStream = require('./lib/collect-stream');
 var Execution = require('./lib/execution');
+var defaults = require('./defaults.json');
 
 module.exports = VK;
 
@@ -16,15 +17,13 @@ function VK(app, opts, session) {
 		return new VK(opts);
 	}
 
-	this.app = app || {};
+	this.app = objectAssign(defaults.app, app);
 
 	if (this.app.scope instanceof Array) {
 		this.app.scope = this.app.scope.join(',');
-	} else {
-		this.app.scope = (typeof this.app.scope === 'string') ? this.app.scope : '';
 	}
 
-	this.opts = objectAssign(config, opts);
+	this.opts = objectAssign(defaults.options, opts);
 	this.session = session || {};
 
 	this._deferred = [];
@@ -60,7 +59,8 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 	var options = [
 		'client_id',
 		'redirect_uri',
-		'scope'
+		'scope',
+		'v'
 	];
 
 	if (includeSecret || false) {
@@ -69,21 +69,20 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 
 	query = supplyQuery(query, this.app, options);
 
-	query['v'] = query['v'] || this.opts.apiVersion;
-
 	return query;
 };
 
 VK.prototype.renderAuthUrl =
 VK.prototype.authUrl = function (query) {
 	query = this._prepareAuthQuery(query);
-	return [config.authUrl, qs.stringify(query)].join('?');
+
+	return [defaults.endpoints.auth, qs.stringify(query)].join('?');
 };
 
 VK.prototype._performAuth = function (query, callback) {
 	var _this = this;
 
-	var promise = got(this.opts.tokenUrl, this._gotOptions({
+	var promise = got(defaults.endpoints.token, this._gotOptions({
 		query: query
 	}))
 	.then(function (res) {
@@ -112,7 +111,8 @@ VK.prototype.siteAuth = function (query, callback) {
 
 VK.prototype.performServerAuth =
 VK.prototype.serverAuth = function (query, callback) {
-	query = query = this._prepareAuthQuery(query, false);
+	query = this._prepareAuthQuery(query, false);
+
 	query['grant_type'] = 'client_credentials';
 
 	return this._performAuth(query, callback);
@@ -142,13 +142,13 @@ VK.prototype.apiCall = function (method, query, callback) {
 
 	query = (typeof query === 'object') ? query : {};
 
-	query['v'] = query['v'] || this.opts.apiVersion;
+	query['v'] = query['v'] || this.app.v;
 
 	if (!vkUtil.isOpenMethod(method)) {
 		query['access_token'] = this.session.token;
 	}
 
-	var url = [config.apiUrl, method].join('/');
+	var url = [defaults.endpoints.methods, method].join('/');
 
 	var _this = this;
 
@@ -214,9 +214,9 @@ VK.prototype._enqueue = function () {
 
 	if (!this._canCall()) {
 		remains = this.nextCall - new Date();
-		this.nextCall = new Date(this.nextCall.valueOf() + this.opts.delay);
+		this.nextCall = new Date(this.nextCall.valueOf() + this.opts.interval);
 	} else {
-		this.nextCall = new Date(Date.now() + this.opts.delay);
+		this.nextCall = new Date(Date.now() + this.opts.interval);
 	}
 
 	return new Promise(function (resolve) {
@@ -225,7 +225,10 @@ VK.prototype._enqueue = function () {
 };
 
 VK.prototype._gotOptions = function (opts) {
-	return objectAssign(this.opts.defaultGotOptions || {}, opts);
+	return objectAssign(defaults.got, filterObj(this.opts, [
+		'timeout',
+		'headers'
+	]), opts);
 };
 
 function supplyQuery(query, source, opts) {

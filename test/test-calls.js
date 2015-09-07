@@ -6,7 +6,12 @@ var app = {
 	clientId: 'CLIENT_ID',
 	clientSecret: 'CLIENT_SECRET',
 	redirectUri: 'REDIRECT_URI',
-	scope: ['offline', 'photos']
+	scope: ['offline']
+};
+
+var session = {
+	token: process.env.VK_API_TOKEN,
+	expires: 0
 };
 
 test('pre-request checks', function (t) {
@@ -34,7 +39,7 @@ test('pre-request checks', function (t) {
 });
 
 test('making request', function (t) {
-	var vk = new VK(app);
+	var vk = new VK(app, null, session);
 
 	t.ok(vk.performApiCall('users.get') instanceof Promise, '#performApiCall() without callback returns Promise');
 	t.ok(vk.performApiCall('users.get', {}, function () {}) instanceof VK, '#performApiCall() with callback returns VK');

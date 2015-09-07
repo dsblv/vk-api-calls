@@ -1,0 +1,21 @@
+{
+	"endpoints": {
+		"auth": "https://oauth.vk.com/authorize",
+		"token": "https://oauth.vk.com/access_token",
+		"methods": "https://api.vk.com/method"
+	},
+	"app": {
+		"v": 5.37,
+		"scope": ""
+	},
+	"options": {
+		"interval": 666,
+		"timeout": 30000,
+		"headers": {
+			"user-agent": "https://github.com/dsblv/vk-api-calls"
+		}
+	},
+	"got": {
+		"json": true
+	}
+}

@@ -3,7 +3,7 @@ var VK = require('../');
 
 test('throttleing requests via _enqueue', function (t) {
 	var vk = new VK(null, {
-		delay: 1000
+		interval: 1000
 	});
 
 	t.plan(2);
@@ -17,7 +17,7 @@ test('throttleing requests via _enqueue', function (t) {
 
 	vk._enqueue()
 	.then(function () {
-		t.ok(Date.now() - now >= 1000, 'next request is delayed by 1 second');
+		t.ok(Date.now() - now >= 900, 'next request is delayed by 1 second');
 		t.end();
 	});
 });
