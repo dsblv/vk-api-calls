@@ -45,7 +45,15 @@ test('making request', function (t) {
 	t.ok(vk.performApiCall('users.get', {}, function () {}) instanceof VK, '#performApiCall() with callback returns VK');
 	t.ok(vk.performApiCall('users.get', function () {}) instanceof VK, '#performApiCall() with callback in place of query returns VK');
 
-	t.end();
+	vk.performApiCall('users.search', {q: 'Dima'})
+	.then(function () {
+		t.pass();
+		t.end();
+	})
+	.catch(function () {
+		t.fail();
+		t.end();
+	});
 });
 
 test('collect stream', function (t) {
@@ -54,4 +62,18 @@ test('collect stream', function (t) {
 	t.ok(vk.collectStream('groups.getMembers') instanceof ReadableStream, '#collectStream returns stream.Readable instance');
 
 	t.end();
+});
+
+test('#collect()', function (t) {
+	var vk = new VK(app, null, session);
+
+	vk.collect('groups.getMembers', {'group_id': 'wryubwy'})
+	.then(function () {
+		t.pass();
+		t.end();
+	})
+	.catch(function () {
+		t.fail();
+		t.end();
+	});
 });
