@@ -19,7 +19,7 @@ var sess = {
 };
 
 test('automatic instance creation', function (t) {
-	var vk = VK(app);
+	var vk = new VK(app);
 	t.ok(vk instanceof VK, 'new instance created without "new"');
 	t.end();
 });
@@ -29,7 +29,7 @@ test('accepting app data', function (t) {
 	t.is(vk.app.clientId, app.clientId, 'clientId saved');
 	t.is(vk.app.clientSecret, app.clientSecret, 'clientSecret saved');
 	t.is(vk.app.redirectUri, app.redirectUri, 'redirectUri saved');
-	t.is(vk.app.scope, 'wall,friends', 'scope saves and transformed to string');
+	t.is(vk.app.scope, 8194, 'scope saves and transformed to bit mask');
 	t.end();
 });
 

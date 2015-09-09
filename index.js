@@ -1,33 +1,31 @@
 'use strict';
 
-var got = require('got');
 var qs = require('querystring');
+var got = require('got');
 var camelCase = require('camelcase');
 var objectAssign = require('object-assign');
 var filterObj = require('filter-obj');
 var vkUtil = require('vk-api-util');
+var Queue = require('./lib/queue');
 var CollectStream = require('./lib/collect-stream');
+var collect = require('./lib/collect');
 var Execution = require('./lib/execution');
 var defaults = require('./defaults.json');
 
-module.exports = VK;
-
-function VK(app, opts, session) {
+var VK = module.exports = function (app, opts, session) {
 	if (!(this instanceof VK)) {
 		return new VK(opts);
 	}
 
 	this.app = objectAssign(defaults.app, app);
-
-	if (this.app.scope instanceof Array) {
-		this.app.scope = this.app.scope.join(',');
-	}
+	this.app.scope = vkUtil.bitMask(this.app.scope);
 
 	this.opts = objectAssign(defaults.options, opts);
 	this.session = session || {};
 
-	this._deferred = [];
-}
+	var queue = new Queue(this.opts.interval);
+	this._enqueue = queue.enqueue.bind(queue);
+};
 
 VK.prototype.setSession = function (data) {
 	this.session = {
@@ -121,15 +119,15 @@ VK.prototype.serverAuth = function (query, callback) {
 VK.prototype.performApiCall =
 VK.prototype.apiCall = function (method, query, callback) {
 	if (typeof method !== 'string') {
-		throw new Error('Method name should be a string');
+		throw new TypeError('Method name should be a string');
 	}
 
 	if (!vkUtil.isMethod(method)) {
-		throw new Error('Unknown method');
+		throw new TypeError('Unknown method');
 	}
 
 	if (!this.hasInScope(method)) {
-		throw new Error('Method "' + method + '" is not in your application\'s scope');
+		throw new TypeError('Method "' + method + '" is not in your application\'s scope');
 	}
 
 	if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
@@ -153,7 +151,7 @@ VK.prototype.apiCall = function (method, query, callback) {
 	var _this = this;
 
 	var promise = this._enqueue().then(function () {
-		got.post(url, _this._gotOptions({query: query}), callback);
+		return got.post(url, _this._gotOptions({query: query}), callback);
 	});
 
 	return (typeof callback === 'function') ? this : promise;
@@ -167,61 +165,10 @@ VK.prototype.collectStream = function (method, query) {
 	return new CollectStream(this, method, query);
 };
 
-VK.prototype.collect = function (method, query, callback) {
-	var stream = this.collectStream(method, query);
-
-	var promise = new Promise(function (resolve, reject) {
-		var stored = {
-			items: []
-		};
-
-		stream
-		.on('data', function (data) {
-			data.items = stored.items.concat(data.items);
-			stored = objectAssign(stored, data);
-		})
-		.on('error', function (err) {
-			reject(err);
-			if (typeof callback === 'function') {
-				callback(err, null);
-			}
-		})
-		.on('end', function () {
-			resolve(stored);
-			if (typeof callback === 'function') {
-				callback(null, stored);
-			}
-		});
-	});
-
-	promise.stream = stream;
-
-	return (typeof callback === 'function') ? this : promise;
-};
+VK.prototype.collect = collect;
 
 VK.prototype.hasInScope = function (method) {
 	return vkUtil.isMethodInScope(method, this.app.scope);
-};
-
-VK.prototype._canCall = function () {
-	var now = new Date();
-	this.nextCall = this.nextCall || now;
-	return !(this.nextCall > now);
-};
-
-VK.prototype._enqueue = function () {
-	var remains = 0;
-
-	if (!this._canCall()) {
-		remains = this.nextCall - new Date();
-		this.nextCall = new Date(this.nextCall.valueOf() + this.opts.interval);
-	} else {
-		this.nextCall = new Date(Date.now() + this.opts.interval);
-	}
-
-	return new Promise(function (resolve) {
-		setTimeout(resolve, remains);
-	});
 };
 
 VK.prototype._gotOptions = function (opts) {
@@ -237,7 +184,7 @@ function supplyQuery(query, source, opts) {
 			if (typeof source[camelCase(option)] !== 'undefined') {
 				query[option] = source[camelCase(option)];
 			} else {
-				throw new Error('Please supply "' + option + '" option');
+				throw new TypeError('Please supply "' + option + '" option');
 			}
 		}
 	});
