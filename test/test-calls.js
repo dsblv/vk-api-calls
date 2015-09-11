@@ -17,25 +17,70 @@ var session = {
 test('pre-request checks', function (t) {
 	var vk = new VK(app);
 
-	t.plan(4);
+	vk.performApiCall().catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws without method');
+		}
+	});
 
-	t.throws(function () {
-		vk.performApiCall();
-	}, 'throws without method');
+	vk.performApiCall('', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws without method');
+		}
+	});
 
-	t.throws(function () {
-		vk.performApiCall('foobar');
-	}, 'throws when method unknown');
+	vk.performApiCall('foobar').catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method unknown');
+		}
+	});
 
-	t.throws(function () {
-		vk.performApiCall('groups.leave', {'group_id': 1});
-	}, 'throws when method is out of scope');
+	vk.performApiCall('foobar', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method unknown');
+		}
+	});
 
-	t.throws(function () {
-		vk.performApiCall('photos.getAlbumsCount');
-	}, 'throws when token is needed but not provided');
+	vk.performApiCall('groups.leave', {'group_id': 1}).catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method is out of scope');
+		}
+	});
 
-	t.end();
+	vk.performApiCall('groups.leave', {'group_id': 1}, function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method is out of scope');
+		}
+	});
+
+	vk.performApiCall('photos.getAlbumsCount').catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when token is needed but not provided');
+		}
+	});
+
+	vk.performApiCall('photos.getAlbumsCount', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when token is needed but not provided');
+		}
+		t.end();
+	});
 });
 
 test('making request', function (t) {

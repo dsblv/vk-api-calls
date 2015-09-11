@@ -46,13 +46,13 @@ VK.prototype.getToken = function () {
 };
 
 VK.prototype.hasValidToken = function (session) {
-	session = session || this.session;
+	session || (session = this.session);
 
 	return Boolean(session) && (session.expires === 0 || session.expires > Date.now());
 };
 
 VK.prototype._prepareAuthQuery = function (query, includeSecret) {
-	query = query || {};
+	query || (query = {});
 
 	var options = [
 		'client_id',
@@ -98,7 +98,7 @@ VK.prototype._performAuth = function (query, callback) {
 
 VK.prototype.performSiteAuth =
 VK.prototype.siteAuth = function (query, callback) {
-	if (!query || typeof query['code'] === 'undefined') {
+	if (!query || typeof query.code === 'undefined') {
 		var error = new Error('Authorization Code Flow requires CODE parameter');
 
 		if (typeof callback === 'function') {
@@ -118,7 +118,7 @@ VK.prototype.performServerAuth =
 VK.prototype.serverAuth = function (query, callback) {
 	query = this._prepareAuthQuery(query, false);
 
-	query['grant_type'] = 'client_credentials';
+	query.grant_type = 'client_credentials';
 
 	return this._performAuth(query, callback);
 };
@@ -133,17 +133,11 @@ VK.prototype.apiCall = function (method, query, callback) {
 
 	if (typeof method !== 'string') {
 		error = new TypeError('Method name should be a string');
-	}
-
-	if (!error && !vkUtil.isMethod(method)) {
+	} else if (!vkUtil.isMethod(method)) {
 		error = new TypeError('Unknown method');
-	}
-
-	if (!error && !this.hasInScope(method)) {
+	} else if (!this.hasInScope(method)) {
 		error = new TypeError('Method "' + method + '" is not in your application\'s scope');
-	}
-
-	if (!error && !vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
+	} else if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
 		error = new Error('Token is expired or not set');
 	}
 
@@ -156,12 +150,11 @@ VK.prototype.apiCall = function (method, query, callback) {
 		return Promise.reject(error);
 	}
 
-	query = (typeof query === 'object') ? query : {};
-
-	query['v'] = query['v'] || this.app.v;
+	typeof query === 'object' || (query = {});
+	query.v || (query.v = this.app.v);
 
 	if (!vkUtil.isOpenMethod(method)) {
-		query['access_token'] = this.session.token;
+		query.access_token = this.session.token;
 	}
 
 	var url = [defaults.endpoints.methods, method].join('/');

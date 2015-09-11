@@ -38,7 +38,9 @@
   },
   "xo": {
     "rules": {
-      "dot-notation": 0
+      "dot-notation": 0,
+      "no-unused-expressions": 0,
+      "camelcase": 0
     },
     "ignores": [
       "test.js",
