@@ -11,11 +11,13 @@ var app = {
 test('pre-site-auth checks', function (t) {
 	var vk = new VK();
 
-	t.plan(1);
-
-	t.throws(function () {
-		vk.performSiteAuth();
-	}, 'throws when no code provided');
+	vk.performSiteAuth().catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when no code provided');
+		}
+	});
 
 	t.end();
 });
