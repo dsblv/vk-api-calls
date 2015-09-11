@@ -25,7 +25,23 @@ test('pre-request checks', function (t) {
 		}
 	});
 
+	vk.performApiCall('', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws without method');
+		}
+	});
+
 	vk.performApiCall('foobar').catch(function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method unknown');
+		}
+	});
+
+	vk.performApiCall('foobar', function(err) {
 		if (err) {
 			t.throws(function () {
 				throw err;
@@ -41,6 +57,14 @@ test('pre-request checks', function (t) {
 		}
 	});
 
+	vk.performApiCall('groups.leave', {'group_id': 1}, function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when method is out of scope');
+		}
+	});
+
 	vk.performApiCall('photos.getAlbumsCount').catch(function(err) {
 		if (err) {
 			t.throws(function () {
@@ -49,7 +73,14 @@ test('pre-request checks', function (t) {
 		}
 	});
 
-	t.end();
+	vk.performApiCall('photos.getAlbumsCount', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when token is needed but not provided');
+		}
+		t.end();
+	});
 });
 
 test('making request', function (t) {

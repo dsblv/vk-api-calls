@@ -19,7 +19,14 @@ test('pre-site-auth checks', function (t) {
 		}
 	});
 
-	t.end();
+	vk.performSiteAuth('', function(err) {
+		if (err) {
+			t.throws(function () {
+				throw err;
+			}, 'throws when no code provided');
+		}
+		t.end();
+	});
 });
 
 test('auth url rendering', function (t) {
