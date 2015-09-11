@@ -99,7 +99,14 @@ VK.prototype._performAuth = function (query, callback) {
 VK.prototype.performSiteAuth =
 VK.prototype.siteAuth = function (query, callback) {
 	if (!query || typeof query['code'] === 'undefined') {
-		throw new Error('Authorization Code Flow requires CODE parameter');
+		var error = new Error('Authorization Code Flow requires CODE parameter');
+
+		if (typeof callback === 'function') {
+			callback(error);
+			return this;
+		}
+
+		return Promise.reject(error);
 	}
 
 	query = this._prepareAuthQuery(query, true);
@@ -118,24 +125,35 @@ VK.prototype.serverAuth = function (query, callback) {
 
 VK.prototype.performApiCall =
 VK.prototype.apiCall = function (method, query, callback) {
-	if (typeof method !== 'string') {
-		throw new TypeError('Method name should be a string');
-	}
-
-	if (!vkUtil.isMethod(method)) {
-		throw new TypeError('Unknown method');
-	}
-
-	if (!this.hasInScope(method)) {
-		throw new TypeError('Method "' + method + '" is not in your application\'s scope');
-	}
-
-	if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
-		throw new Error('Token is expired or not set');
-	}
-
 	if (typeof query === 'function') {
 		callback = query;
+	}
+
+	var error;
+
+	if (typeof method !== 'string') {
+		error = new TypeError('Method name should be a string');
+	}
+
+	if (!error && !vkUtil.isMethod(method)) {
+		error = new TypeError('Unknown method');
+	}
+
+	if (!error && !this.hasInScope(method)) {
+		error = new TypeError('Method "' + method + '" is not in your application\'s scope');
+	}
+
+	if (!error && !vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
+		error = new Error('Token is expired or not set');
+	}
+
+	if (error) {
+		if (typeof callback === 'function') {
+			callback(error);
+			return this;
+		}
+
+		return Promise.reject(error);
 	}
 
 	query = (typeof query === 'object') ? query : {};
