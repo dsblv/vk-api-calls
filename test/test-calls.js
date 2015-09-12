@@ -19,23 +19,21 @@ test('pre-request checks', function (t) {
 
 	t.plan(4);
 
-	t.throws(function () {
-		vk.performApiCall();
-	}, 'throws without method');
+	vk.performApiCall().catch(function (err) {
+		t.ok(err, 'throws without method');
+	});
 
-	t.throws(function () {
-		vk.performApiCall('foobar');
-	}, 'throws when method unknown');
+	vk.performApiCall('foobar').catch(function (err) {
+		t.ok(err, 'throws when method unknown');
+	});
 
-	t.throws(function () {
-		vk.performApiCall('groups.leave', {'group_id': 1});
-	}, 'throws when method is out of scope');
+	vk.performApiCall('groups.leave', {'group_id': 1}).catch(function (err) {
+		t.ok(err, 'throws when method is out of scope');
+	});
 
-	t.throws(function () {
-		vk.performApiCall('photos.getAlbumsCount');
-	}, 'throws when token is needed but not provided');
-
-	t.end();
+	vk.performApiCall('photos.getAlbumsCount').catch(function (err) {
+		t.ok(err, 'throws when token is needed but not provided');
+	});
 });
 
 test('making request', function (t) {

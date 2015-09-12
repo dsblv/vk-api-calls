@@ -13,11 +13,9 @@ test('pre-site-auth checks', function (t) {
 
 	t.plan(1);
 
-	t.throws(function () {
-		vk.performSiteAuth();
-	}, 'throws when no code provided');
-
-	t.end();
+	vk.performSiteAuth().catch(function (err) {
+		t.ok(err, 'throws when no code provided');
+	});
 });
 
 test('auth url rendering', function (t) {
