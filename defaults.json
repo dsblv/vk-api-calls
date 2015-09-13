@@ -6,7 +6,7 @@
 	},
 	"app": {
 		"v": 5.37,
-		"scope": ""
+		"scope": 0
 	},
 	"options": {
 		"interval": 666,

@@ -133,17 +133,14 @@ VK.prototype.apiCall = function (method, query, callback) {
 
 	if (typeof method !== 'string') {
 		error = new TypeError('Method name should be a string');
-	}
-
-	if (!error && !vkUtil.isMethod(method)) {
+	} else
+	if (!vkUtil.isMethod(method)) {
 		error = new TypeError('Unknown method');
-	}
-
-	if (!error && !this.hasInScope(method)) {
+	} else
+	if (!this.hasInScope(method)) {
 		error = new TypeError('Method "' + method + '" is not in your application\'s scope');
-	}
-
-	if (!error && !vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
+	} else
+	if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
 		error = new Error('Token is expired or not set');
 	}
 

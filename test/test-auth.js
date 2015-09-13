@@ -1,4 +1,4 @@
-var test = require('tap').test;
+var test = require('ava');
 var VK = require('../');
 
 var app = {
@@ -28,7 +28,7 @@ test('auth url rendering', function (t) {
 	t.end();
 });
 
-test('site authentication', function (t) {
+test.serial('site authentication', function (t) {
 	var vk = new VK(app);
 
 	t.plan(2);
@@ -39,7 +39,7 @@ test('site authentication', function (t) {
 	t.end();
 });
 
-test('server authentication', function (t) {
+test.serial('server authentication', function (t) {
 	var vk = new VK(app);
 
 	t.plan(2);

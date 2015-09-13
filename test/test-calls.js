@@ -1,4 +1,4 @@
-var test = require('tap').test;
+var test = require('ava');
 var VK = require('../');
 var ReadableStream = require('stream').Readable;
 
@@ -36,25 +36,23 @@ test('pre-request checks', function (t) {
 	});
 });
 
-test('making request', function (t) {
+test.serial('making request', function (t) {
 	var vk = new VK(app, null, session);
 
 	t.ok(vk.performApiCall('users.get') instanceof Promise, '#performApiCall() without callback returns Promise');
 	t.ok(vk.performApiCall('users.get', {}, function () {}) instanceof VK, '#performApiCall() with callback returns VK');
 	t.ok(vk.performApiCall('users.get', function () {}) instanceof VK, '#performApiCall() with callback in place of query returns VK');
 
-	vk.performApiCall('users.search', {q: 'Dima'})
+	return vk.performApiCall('users.search', {q: 'Dima'})
 	.then(function () {
 		t.pass();
-		t.end();
 	})
 	.catch(function () {
 		t.fail();
-		t.end();
 	});
 });
 
-test('collect stream', function (t) {
+test.serial('collect stream', function (t) {
 	var vk = new VK(app);
 
 	t.ok(vk.collectStream('groups.getMembers') instanceof ReadableStream, '#collectStream returns stream.Readable instance');
@@ -62,16 +60,14 @@ test('collect stream', function (t) {
 	t.end();
 });
 
-test('#collect()', function (t) {
+test.serial('#collect()', function (t) {
 	var vk = new VK(app, null, session);
 
-	vk.collect('groups.getMembers', {'group_id': 'wryubwy'})
+	return vk.collect('groups.getMembers', {'group_id': 'wryubwy'})
 	.then(function () {
 		t.pass();
-		t.end();
 	})
 	.catch(function () {
 		t.fail();
-		t.end();
 	});
 });

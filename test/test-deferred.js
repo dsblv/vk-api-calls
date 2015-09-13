@@ -1,4 +1,4 @@
-var test = require('tap').test;
+var test = require('ava');
 var VK = require('../');
 
 var session = {
@@ -32,7 +32,7 @@ test('limiting the amount of calls', function (t) {
 	t.end();
 });
 
-test('deferred execution', function (t) {
+test.serial('deferred execution', function (t) {
 	var vk = new VK(null, null, session);
 	var exec = vk.execution();
 
