@@ -9,7 +9,7 @@
 		"scope": 0
 	},
 	"options": {
-		"interval": 666,
+		"interval": 333,
 		"timeout": 30000,
 		"headers": {
 			"user-agent": "https://github.com/dsblv/vk-api-calls"
