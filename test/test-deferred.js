@@ -22,11 +22,11 @@ test('limiting the amount of calls', function (t) {
 	var exec = vk.execution();
 
 	for (var i = 0; i < 25; i++) {
-		exec.push('users.get', {'user_ids': i});
+		exec.push('users.get', {userIds: i});
 	}
 
 	t.throws(function () {
-		exec.push('users.get', {'user_ids': i});
+		exec.push('users.get', {userIds: 26});
 	}, 'throwing when limit exceeded');
 
 	t.end();
@@ -40,7 +40,7 @@ test.serial('deferred execution', function (t) {
 		exec.execute();
 	}, 'throwing when nothing to execute');
 
-	exec.push('users.get', {'user_ids': 1});
+	exec.push('users.get', {userIds: 1});
 
 	t.ok(exec.execute() instanceof Promise, 'without callback returns Promise');
 

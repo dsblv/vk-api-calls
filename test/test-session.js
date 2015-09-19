@@ -1,11 +1,12 @@
+/* eslint camelcase: 0 */
 var test = require('ava');
 var VK = require('../');
 
 test('saving session data', function (t) {
 	var data = {
-		'access_token': 'ACCESS_TOKEN',
-		'user_id': 'USER_ID',
-		'expires_in': 3600
+		access_token: 'ACCESS_TOKEN',
+		user_id: 'USER_ID',
+		expires_in: 3600
 	};
 
 	var vk = new VK();
@@ -20,21 +21,21 @@ test('saving session data', function (t) {
 
 test('token validation', function (t) {
 	var goodData = {
-		'access_token': 'ACCESS_TOKEN',
-		'user_id': 'USER_ID',
-		'expires_in': 3600
+		access_token: 'ACCESS_TOKEN',
+		user_id: 'USER_ID',
+		expires_in: 3600
 	};
 
 	var eternalData = {
-		'access_token': 'ACCESS_TOKEN',
-		'user_id': 'USER_ID',
-		'expires_in': 0
+		access_token: 'ACCESS_TOKEN',
+		user_id: 'USER_ID',
+		expires_in: 0
 	};
 
 	var badData = {
-		'access_token': 'ACCESS_TOKEN',
-		'user_id': 'USER_ID',
-		'expires_in': -1
+		access_token: 'ACCESS_TOKEN',
+		user_id: 'USER_ID',
+		expires_in: -1
 	};
 
 	var vk = new VK();

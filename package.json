@@ -32,26 +32,16 @@
   ],
   "dependencies": {
     "camelcase": "^1.2.1",
-    "filter-obj": "^1.1.0",
+    "decamelize": "^1.0.0",
     "got": "^4.1.1",
     "object-assign": "^4.0.1",
     "queue-up": "^1.0.1",
-    "vk-api-util": "^1.1.0"
+    "vk-api-util": "^1.1.0",
+    "vk-got": "^1.1.0"
   },
   "devDependencies": {
     "ava": "^0.2.0",
     "istanbul": "^0.3.20",
     "xo": "*"
-  },
-  "xo": {
-    "envs": [
-      "node"
-    ],
-    "rules": {
-      "dot-notation": 0
-    },
-    "ignore": [
-      "test/*"
-    ]
   }
 }

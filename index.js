@@ -1,10 +1,9 @@
 'use strict';
 
 var qs = require('querystring');
-var got = require('got');
-var camelCase = require('camelcase');
+var vkGot = require('vk-got');
+var decamelize = require('decamelize');
 var objectAssign = require('object-assign');
-var filterObj = require('filter-obj');
 var vkUtil = require('vk-api-util');
 var Queue = require('queue-up');
 var CollectStream = require('./lib/collect-stream');
@@ -55,17 +54,27 @@ VK.prototype._prepareAuthQuery = function (query, includeSecret) {
 	query = query || {};
 
 	var options = [
-		'client_id',
-		'redirect_uri',
+		'clientId',
+		'redirectUri',
 		'scope',
 		'v'
 	];
 
-	if (includeSecret || false) {
-		options.push('client_secret');
+	if (includeSecret) {
+		options.push('clientSecret');
 	}
 
-	query = supplyQuery(query, this.app, options);
+	var source = this.app;
+
+	options.forEach(function (option) {
+		if (!query[option]) {
+			if (typeof source[option] !== 'undefined') {
+				query[option] = source[option];
+			} else {
+				throw new TypeError('Please supply "' + option + '" option');
+			}
+		}
+	});
 
 	return query;
 };
@@ -74,102 +83,85 @@ VK.prototype.renderAuthUrl =
 VK.prototype.authUrl = function (query) {
 	query = this._prepareAuthQuery(query);
 
+	Object.keys(query).forEach(function (key) {
+		var dcKey = decamelize(key, '_');
+
+		query[dcKey] = query[key];
+
+		if (dcKey !== key) {
+			delete query[key];
+		}
+	});
+
 	return [defaults.endpoints.auth, qs.stringify(query)].join('?');
 };
 
-VK.prototype._performAuth = function (query, callback) {
+VK.prototype._performAuth = function (query) {
 	var _this = this;
 
-	var promise = got(defaults.endpoints.token, this._gotOptions({
-		query: query
-	}))
-	.then(function (res) {
+	return vkGot.token({
+		body: query,
+		timeout: _this.opts.timeout,
+		headers: _this.opts.headers
+	}).then(function (res) {
 		_this.setSession(res.body);
-
-		if (typeof callback === 'function') {
-			callback(null, res.body, res);
-		}
-
 		return res;
 	});
-
-	return (typeof callback === 'function') ? this : promise;
 };
 
 VK.prototype.performSiteAuth =
-VK.prototype.siteAuth = function (query, callback) {
-	if (!query || typeof query['code'] === 'undefined') {
-		var error = new Error('Authorization Code Flow requires CODE parameter');
-
-		if (typeof callback === 'function') {
-			callback(error);
-			return this;
-		}
-
-		return Promise.reject(error);
+VK.prototype.siteAuth = function (query) {
+	if (!query || typeof query.code === 'undefined') {
+		return Promise.reject(new TypeError('Authorization Code Flow requires CODE parameter'));
 	}
 
 	query = this._prepareAuthQuery(query, true);
 
-	return this._performAuth(query, callback);
+	return this._performAuth(query);
 };
 
 VK.prototype.performServerAuth =
-VK.prototype.serverAuth = function (query, callback) {
+VK.prototype.serverAuth = function (query) {
 	query = this._prepareAuthQuery(query, false);
 
-	query['grant_type'] = 'client_credentials';
+	query.grantType = 'client_credentials';
 
-	return this._performAuth(query, callback);
+	return this._performAuth(query);
 };
 
 VK.prototype.performApiCall =
-VK.prototype.apiCall = function (method, query, callback) {
-	if (typeof query === 'function') {
-		callback = query;
-	}
-
-	var error;
-
+VK.prototype.apiCall = function (method, query) {
 	if (typeof method !== 'string') {
-		error = new TypeError('Method name should be a string');
-	} else
+		return Promise.reject(new TypeError('Method name should be a string'));
+	}
+
 	if (!vkUtil.isMethod(method)) {
-		error = new TypeError('Unknown method');
-	} else
+		return Promise.reject(new TypeError('Unknown method'));
+	}
+
 	if (!this.hasInScope(method)) {
-		error = new TypeError('Method "' + method + '" is not in your application\'s scope');
-	} else
+		return Promise.reject(new TypeError('Method "' + method + '" is not in your application\'s scope'));
+	}
+
 	if (!vkUtil.isOpenMethod(method) && !this.hasValidToken()) {
-		error = new Error('Token is expired or not set');
+		return Promise.reject(new Error('Token is expired or not set'));
 	}
 
-	if (error) {
-		if (typeof callback === 'function') {
-			callback(error);
-			return this;
-		}
-
-		return Promise.reject(error);
-	}
-
-	query = (typeof query === 'object') ? query : {};
-
-	query['v'] = query['v'] || this.app.v;
-
-	if (!vkUtil.isOpenMethod(method)) {
-		query['access_token'] = this.session.token;
-	}
-
-	var url = [defaults.endpoints.methods, method].join('/');
-
-	var _this = this;
-
-	var promise = this._enqueue().then(function () {
-		return got.post(url, _this._gotOptions({query: query}), callback);
+	query = objectAssign({}, query, {
+		v: this.app.v
 	});
 
-	return (typeof callback === 'function') ? this : promise;
+	var token = (!vkUtil.isOpenMethod(method)) ? this.session.token : null;
+	var _this = this;
+
+	return this._enqueue().then(function () {
+		return vkGot(method, {
+			token: token,
+			body: query,
+			timeout: _this.opts.timeout,
+			headers: _this.opts.headers
+		});
+	});
 };
 
 VK.prototype.execution = function () {
@@ -185,24 +177,3 @@ VK.prototype.collect = collect;
 VK.prototype.hasInScope = function (method) {
 	return vkUtil.isMethodInScope(method, this.app.scope);
 };
-
-VK.prototype._gotOptions = function (opts) {
-	return objectAssign(defaults.got, filterObj(this.opts, [
-		'timeout',
-		'headers'
-	]), opts);
-};
-
-function supplyQuery(query, source, opts) {
-	opts.forEach(function (option) {
-		if (!query[option]) {
-			if (typeof source[camelCase(option)] !== 'undefined') {
-				query[option] = source[camelCase(option)];
-			} else {
-				throw new TypeError('Please supply "' + option + '" option');
-			}
-		}
-	});
-
-	return query;
-}

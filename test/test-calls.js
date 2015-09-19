@@ -27,7 +27,7 @@ test('pre-request checks', function (t) {
 		t.ok(err, 'throws when method unknown');
 	});
 
-	vk.performApiCall('groups.leave', {'group_id': 1}).catch(function (err) {
+	vk.performApiCall('groups.leave', {groupId: 1}).catch(function (err) {
 		t.ok(err, 'throws when method is out of scope');
 	});
 
@@ -39,16 +39,8 @@ test('pre-request checks', function (t) {
 test.serial('making request', function (t) {
 	var vk = new VK(app, null, session);
 
-	t.ok(vk.performApiCall('users.get') instanceof Promise, '#performApiCall() without callback returns Promise');
-	t.ok(vk.performApiCall('users.get', {}, function () {}) instanceof VK, '#performApiCall() with callback returns VK');
-	t.ok(vk.performApiCall('users.get', function () {}) instanceof VK, '#performApiCall() with callback in place of query returns VK');
-
-	return vk.performApiCall('users.search', {q: 'Dima'})
-	.then(function () {
+	return vk.performApiCall('users.get', {userIds: 'sobo13v'}).then(function () {
 		t.pass();
-	})
-	.catch(function () {
-		t.fail();
 	});
 });
 
@@ -60,14 +52,10 @@ test.serial('collect stream', function (t) {
 	t.end();
 });
 
-test.serial('#collect()', function (t) {
+test.serial('collect', function (t) {
 	var vk = new VK(app, null, session);
 
-	return vk.collect('groups.getMembers', {'group_id': 'wryubwy'})
-	.then(function () {
-		t.pass();
-	})
-	.catch(function () {
-		t.fail();
+	return vk.collect('groups.getMembers', {groupId: 'wryubwy'}).then(function (res) {
+		t.ok(typeof res.items !== 'undefined');
 	});
 });
