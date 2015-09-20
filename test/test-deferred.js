@@ -1,14 +1,14 @@
-var test = require('ava');
-var VK = require('../');
+import test from 'ava';
+import VK from '../';
 
-var session = {
+const session = {
 	token: process.env.VK_API_TOKEN,
 	expires: 0
 };
 
-test('deferring calls for multiple execution', function (t) {
-	var vk = new VK();
-	var exec = vk.execution();
+test('deferring calls for multiple execution', t => {
+	const vk = new VK();
+	const exec = vk.execution();
 
 	exec.push('hello', {foo: 'bar'}).push('world');
 
@@ -17,26 +17,26 @@ test('deferring calls for multiple execution', function (t) {
 	t.end();
 });
 
-test('limiting the amount of calls', function (t) {
-	var vk = new VK();
-	var exec = vk.execution();
+test('limiting the amount of calls', t => {
+	const vk = new VK();
+	const exec = vk.execution();
 
-	for (var i = 0; i < 25; i++) {
+	for (let i = 0; i < 25; i++) {
 		exec.push('users.get', {userIds: i});
 	}
 
-	t.throws(function () {
+	t.throws(() => {
 		exec.push('users.get', {userIds: 26});
 	}, 'throwing when limit exceeded');
 
 	t.end();
 });
 
-test.serial('deferred execution', function (t) {
-	var vk = new VK(null, null, session);
-	var exec = vk.execution();
+test.serial('deferred execution', t => {
+	const vk = new VK(null, null, session);
+	const exec = vk.execution();
 
-	t.throws(function () {
+	t.throws(() => {
 		exec.execute();
 	}, 'throwing when nothing to execute');
 

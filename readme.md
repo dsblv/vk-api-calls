@@ -3,13 +3,16 @@ vk-api-calls [![Build Status](https://travis-ci.org/dsblv/vk-api-calls.svg)](htt
 
 > Yet another VK API wrapper for Node.js & io.js.
 
+:exclamation: Despite this module is published on npm and has version 1, it is still heavily under construction. Use it with caution or wait for `2.0.0` which is landing later this week.
+
 ## Features
 
-* (Kind of) easy authentication
+* Simple authentication
 * Multiple API calls at once via [execute](http://vk.com/dev/execute)
-* Collecting paged data
-* Automatic request rate debouncing
-* Callbacks/Promises agnostic
+* Data aggregation
+* Automatic request rate stabilization
+* Promise-based API
+
 
 ## Install
 
@@ -18,6 +21,14 @@ npm install --save vk-api-calls
 ```
 
 ## API
+
+* [Constructor]() — one instance of `vk` per user
+* [Session methods]() — handle `tokens` like a boss
+* [Autnentication]() — all you might need to perform user/server auth
+* [Requests]() — this is what it's all about, right?
+* [Data aggregation]() — fetch a lot of data without breaking the law
+* [Deferred execution]() — optimize your requests
+* [Utility]() — useful methods
 
 ### Constructor
 
@@ -161,7 +172,7 @@ Type: `object`
 Query parameters you may want to manually override.
 
 
-#### `vk.performSiteAuth(query, [callback])` → `promise/this`
+#### `vk.performSiteAuth(query)` → `promise`
 
 *Alias: `vk.siteAuth()`*
 
@@ -181,7 +192,7 @@ Type: `function`
 If callback is supplied, it will be called when server responds. Otherwise, the method returns a Promise.
 
 
-#### `vk.performServerAuth([query], [callback])` → `promise/this`
+#### `vk.performServerAuth([query])` → `promise`
 
 *Alias: `vk.serverAuth()`*
 
@@ -203,7 +214,7 @@ If callback is supplied, it will be called when server responds. Otherwise, the 
 
 ### Request methods
 
-#### `vk.performApiCall(method, [query], [callback])` → `promise/this`
+#### `vk.performApiCall(method, [query])` → `promise`
 
 *Alias: `vk.apiCall()`*
 
@@ -273,7 +284,7 @@ stream.on('error', function (error) {
 });
 ```
 
-#### `vk.collect(method, [query], [callback])` → `promise/this`
+#### `vk.collect(method, [query])` → `promise`
 
 Wrapper around #collectStream() that collects the whole stream.
 

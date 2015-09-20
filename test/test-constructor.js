@@ -1,31 +1,31 @@
-var test = require('ava');
-var VK = require('../');
+import test from 'ava';
+import VK from '../';
 
-var app = {
+const app = {
 	clientId: 'CLIENT_ID',
 	clientSecret: 'CLIENT_SECRET',
 	redirectUri: 'REDIRECT_URI',
 	scope: ['wall', 'friends']
 };
 
-var opts = {
+const opts = {
 	delay: 333
 };
 
-var sess = {
+const sess = {
 	userId: 'USER_ID',
 	token: 'ACCESS_TOKEN',
 	expires: 84600
 };
 
-test('automatic instance creation', function (t) {
-	var vk = new VK(app);
+test('automatic instance creation', t => {
+	const vk = new VK(app);
 	t.ok(vk instanceof VK, 'new instance created without "new"');
 	t.end();
 });
 
-test('accepting app data', function (t) {
-	var vk = new VK(app);
+test('accepting app data', t => {
+	const vk = new VK(app);
 	t.is(vk.app.clientId, app.clientId, 'clientId saved');
 	t.is(vk.app.clientSecret, app.clientSecret, 'clientSecret saved');
 	t.is(vk.app.redirectUri, app.redirectUri, 'redirectUri saved');
@@ -33,14 +33,14 @@ test('accepting app data', function (t) {
 	t.end();
 });
 
-test('updating default options', function (t) {
-	var vk = new VK(app, opts);
+test('updating default options', t => {
+	const vk = new VK(app, opts);
 	t.is(vk.opts.delay, opts.delay, 'delay overriden');
 	t.end();
 });
 
-test('accepting session', function (t) {
-	var vk = new VK(app, opts, sess);
+test('accepting session', t => {
+	const vk = new VK(app, opts, sess);
 	t.is(vk.session, sess, 'session data saved');
 	t.end();
 });

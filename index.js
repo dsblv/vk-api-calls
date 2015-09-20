@@ -1,9 +1,9 @@
 'use strict';
 
 var qs = require('querystring');
-var vkGot = require('vk-got');
 var decamelize = require('decamelize');
-var objectAssign = require('object-assign');
+var deepAssign = require('deep-assign');
+var vkGot = require('vk-got');
 var vkUtil = require('vk-api-util');
 var Queue = require('queue-up');
 var CollectStream = require('./lib/collect-stream');
@@ -16,14 +16,14 @@ var VK = module.exports = function (app, opts, session) {
 		return new VK(opts);
 	}
 
-	this.app = objectAssign(defaults.app, app);
+	this.app = deepAssign(defaults.app, app);
 	this.app.scope = vkUtil.bitMask(this.app.scope);
 
-	this.opts = objectAssign(defaults.options, opts);
+	this.opts = deepAssign(defaults.options, opts);
 	this.session = session || {};
 
 	var queue = new Queue(this.opts.interval);
-	this._enqueue = queue.enqueue.bind(queue);
+	this._enqueue = queue.up.bind(queue);
 };
 
 VK.prototype.setSession = function (data) {
@@ -147,7 +147,7 @@ VK.prototype.apiCall = function (method, query) {
 		return Promise.reject(new Error('Token is expired or not set'));
 	}
 
-	query = objectAssign({}, query, {
+	query = deepAssign({}, query, {
 		v: this.app.v
 	});
 
@@ -161,6 +161,8 @@ VK.prototype.apiCall = function (method, query) {
 			timeout: _this.opts.timeout,
 			headers: _this.opts.headers
 		});
+	}).then(function (res) {
+		return res.body.response;
 	});
 };
 

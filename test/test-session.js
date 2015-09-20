@@ -1,17 +1,11 @@
-/* eslint camelcase: 0 */
-var test = require('ava');
-var VK = require('../');
+import test from 'ava';
+import VK from '../';
+import {goodData, badData, eternalData} from './fixtures/sessions.json';
 
-test('saving session data', function (t) {
-	var data = {
-		access_token: 'ACCESS_TOKEN',
-		user_id: 'USER_ID',
-		expires_in: 3600
-	};
-
+test('saving session data', t => {
 	var vk = new VK();
 
-	vk.setSession(data);
+	vk.setSession(goodData);
 
 	t.plan(2);
 	t.is(vk.getToken(), 'ACCESS_TOKEN', 'access token saved and returned by #getToken()');
@@ -19,25 +13,7 @@ test('saving session data', function (t) {
 	t.end();
 });
 
-test('token validation', function (t) {
-	var goodData = {
-		access_token: 'ACCESS_TOKEN',
-		user_id: 'USER_ID',
-		expires_in: 3600
-	};
-
-	var eternalData = {
-		access_token: 'ACCESS_TOKEN',
-		user_id: 'USER_ID',
-		expires_in: 0
-	};
-
-	var badData = {
-		access_token: 'ACCESS_TOKEN',
-		user_id: 'USER_ID',
-		expires_in: -1
-	};
-
+test('token validation', t => {
 	var vk = new VK();
 
 	t.plan(3);

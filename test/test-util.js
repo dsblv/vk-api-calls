@@ -1,5 +1,5 @@
-var test = require('ava');
-var VK = require('../');
+import test from 'ava';
+import VK from '../';
 
 var app = {
 	clientId: 'CLIENT_ID',
@@ -8,7 +8,7 @@ var app = {
 	scope: ['wall', 'friends']
 };
 
-test('checking method reachability', function (t) {
+test('checking method reachability', t => {
 	var vk = new VK(app);
 
 	t.ok(vk.hasInScope('wall.post'), 'sees scoped method in scope');

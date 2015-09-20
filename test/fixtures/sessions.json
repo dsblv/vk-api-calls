@@ -1,0 +1,17 @@
+{
+	"goodData": {
+		"access_token": "ACCESS_TOKEN",
+		"user_id": "USER_ID",
+		"expires_in": 3600
+	},
+	"eternalData": {
+		"access_token": "ACCESS_TOKEN",
+		"user_id": "USER_ID",
+		"expires_in": 0
+	},
+	"badData": {
+		"access_token": "ACCESS_TOKEN",
+		"user_id": "USER_ID",
+		"expires_in": -1
+	}
+}
